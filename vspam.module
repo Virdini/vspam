@@ -1,0 +1,74 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Component\Utility\UrlHelper;
+use Drupal\vspam\SpamProtectionInterface;
+
+/**
+ * Implements hook_library_info_alter().
+ */
+function vspam_library_info_alter(&$libraries, $extension) {
+  if ($extension === 'vspam' && isset($libraries['google.recaptcha'])) {
+    $key = array_key_first($libraries['google.recaptcha']['js']);
+    $params = [
+      'hl' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
+      'onload' => 'vspamOnload',
+      'render' => \Drupal::config('vspam.settings')->get('site_key'),
+    ];
+    $libraries['google.recaptcha']['js'] = [
+      $key . '?' . UrlHelper::buildQuery($params) => $libraries['google.recaptcha']['js'][$key],
+    ];
+  }
+}
+
+
+/**
+ * Implements hook_form_alter().
+ */
+function vspam_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $config = \Drupal::config('vspam.settings');
+  vbase_add_cacheable_dependency($form, $config);
+
+  // Skip admin-create register form
+  if ($config->get('site_key') && $config->get('secret_key') && $config->get('forms.' . $form_id)
+      && !($form_id == 'user_register_form' && isset($form['administer_users']['#value']) && $form['administer_users']['#value'])) {
+    $form['#attached']['library'][] = 'vspam/form';
+
+    if ($config->get('hide_badge')) {
+      $form['#attached']['library'][] = 'vspam/badge';
+    }
+
+    $form['#attributes']['class'][] = 'vspam-protect';
+    $form['#attributes']['data-vspam-key'] = $config->get('site_key');
+    $form['#attributes']['data-vspam-action'] = $config->get('forms.' . $form_id . '.action') ?: $form_id;
+    $form['vspam_token'] = [
+      '#type' => 'hidden',
+      '#element_validate' => ['vspam_token_validate'],
+      '#weight' => -1000,
+      '#attributes' => [
+        'autocomplete' => 'off',
+      ],
+    ];
+
+    if ($config->get('add_text')) {
+      $form['vspam_branding_text'] = [
+        '#type' => 'container',
+        '#markup' => t(SpamProtectionInterface::GOOGLE_RECAPTCHA_BRANDING),
+        '#weight' => 1000,
+        '#attributes' => [
+          'class' => ['vspam-branding-text'],
+        ],
+      ];
+    }
+  }
+}
+
+/**
+ * Validate spam token.
+ */
+function vspam_token_validate(&$element, FormStateInterface $form_state, &$form) {
+  if (!\Drupal::service('vspam')->verify($form_state->getValue('vspam_token'), $form_state->getValue('form_id'))) {
+    $form_state->setError($element, t('You did not pass the spam test ;('));
+    $form['#validate'] = [];
+  }
+}

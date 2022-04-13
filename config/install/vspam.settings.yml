@@ -1,0 +1,15 @@
+hide_badge: true
+add_text: true
+forms:
+  user_login_form:
+    form_id: user_login_form
+    action: login
+    score: 0.5
+  user_register_form:
+    form_id: user_register_form
+    action: register
+    score: 0.5
+  user_pass:
+    form_id: user_pass
+    action: password
+    score: 0.5

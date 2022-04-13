@@ -1,0 +1,32 @@
+vspam.settings:
+  type: config_object
+  label: 'Spam protection'
+  mapping:
+    site_key:
+      type: string
+      label: 'Google reCAPTCHA site key'
+    secret_key:
+      type: string
+      label: 'Google reCAPTCHA secret key'
+    hide_badge:
+      type: boolean
+      label: 'Hide Google reCAPTCHA badge'
+    add_text:
+      type: boolean
+      label: 'Add Google reCAPTCHA branding text'
+    forms:
+      label: 'Google reCAPTCHA forms'
+      type: sequence
+      sequence:
+        type: mapping
+        label: 'Form'
+        mapping:
+          form_id:
+            type: string
+            label: 'Form ID'
+          action:
+            type: string
+            label: 'Action'
+          score:
+            type: float
+            label: 'Score'

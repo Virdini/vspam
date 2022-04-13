@@ -1,0 +1,11 @@
+name: Virdini Spam Protection
+type: module
+description: Module provides protection against spam for the project.
+package: Virdini
+configure: vspam.settings
+
+'interface translation project': vspam
+'interface translation server pattern': https://localize.virdini.com/drupal/vspam.%language.po
+
+core_version_requirement: ^9
+version: '9.0.0'

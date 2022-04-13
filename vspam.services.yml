@@ -1,0 +1,4 @@
+services:
+  vspam:
+    class: Drupal\vspam\SpamProtection
+    arguments: ['@config.factory', '@cache.default']
