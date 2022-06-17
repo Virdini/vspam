@@ -61,6 +61,12 @@ class SpamProtectionSettings extends ConfigTypedFormBase {
       '#default_value' => $config->get('add_text'),
     ];
 
+    $form['debug'] = [
+      '#title' => $this->t($definition['mapping']['debug']['label']),
+      '#type' => 'checkbox',
+      '#default_value' => $config->get('debug'),
+    ];
+
     $form['forms'] = [
       '#title' => $this->t($definition['mapping']['forms']['label']),
       '#type' => 'fieldset',

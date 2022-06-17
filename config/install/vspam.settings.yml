@@ -1,5 +1,6 @@
 hide_badge: true
 add_text: true
+debug: false
 forms:
   user_login_form:
     form_id: user_login_form

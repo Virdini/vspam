@@ -109,9 +109,20 @@ class SpamProtection implements SpamProtectionInterface {
     $result = $this->request($params);
     $result['ip'] = $params['remoteip'];
     $this->lastResult[$response] = $result;
-
-    return isset($result['success']) && $result['success'] == TRUE
+    $valid = isset($result['success']) && $result['success'] == TRUE
             && $result['action'] == $action && $result['score'] >= $score;
+
+    // Write to watchdog
+    if ($this->settings->get('debug')) {
+      $log = [
+        'valid' => $valid,
+        'request' => $params,
+        'result' => $result,
+      ];
+      $this->getLogger('vspam')->log(RfcLogLevel::DEBUG, '@data', ['@data' => Json::encode($log)]);
+    }
+
+    return $valid;
   }
 
   /**
