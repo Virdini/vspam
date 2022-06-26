@@ -11,7 +11,6 @@ function vspam_library_info_alter(&$libraries, $extension) {
   if ($extension === 'vspam' && isset($libraries['google.recaptcha'])) {
     $key = array_key_first($libraries['google.recaptcha']['js']);
     $params = [
-      'hl' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
       'onload' => 'vspamOnload',
       'render' => \Drupal::config('vspam.settings')->get('site_key'),
     ];
